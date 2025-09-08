@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <title>Pill Dispenser Local</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e6f0ff;
+      color: #003366;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 { color: #0059b3; margin-bottom: 20px; }
+
+    .card {
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+      width: 320px;
+      text-align: center;
+    }
+
+    label { display: block; margin-bottom: 10px; font-weight: bold; }
+    select, input {
+      width: 100%; padding: 8px; border-radius: 8px;
+      border: 1px solid #ccc; margin-bottom: 15px; font-size: 16px;
+    }
+
+    button {
+      background-color: #0059b3;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover { background-color: #003d80; }
+
+    #status { margin-top: 10px; font-weight: bold; }
+    #loguri {
+      width: 100%;
+      height: 200px;
+      background-color: #cce0ff;
+      border-radius: 8px;
+      padding: 10px;
+      overflow-y: auto;
+      font-family: monospace;
+      color: #003366;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pill Dispenser Local</h1>
+
+  <div class="card">
+    <label>Cutie:</label>
+    <select id="cutie">
+      <option value="0">Cutie 1</option>
+      <option value="1">Cutie 2</option>
+      <option value="2">Cutie 3</option>
+      <option value="3">Cutie 4</option>
+    </select>
+
+    <label>Ora (HHMM):</label>
+    <input type="text" id="ora" placeholder="ex: 1200">
+
+    <button onclick="trimiteComanda()">Trimite Comanda</button>
+  </div>
+
+  <div class="card">
+    <button onclick="afiseazaLog()">Vezi Loguri</button>
+    <pre id="loguri"></pre>
+  </div>
+
+  <p id="status"></p>
+
+  <script>
+    const serverIP = "http://192.168.100.39"; // IP-ul local Arduino
+
+    function trimiteComanda() {
+      const cutie = document.getElementById("cutie").value;
+      const ora = document.getElementById("ora").value;
+
+      const url = `${serverIP}/set?cutie=${cutie}&ora=${ora}`;
+      document.getElementById("status").innerText = "Trimitem comanda...";
+
+      fetch(url)
+        .then(res => res.text())
+        .then(text => {
+          document.getElementById("status").innerText = "Răspuns: " + text;
+        })
+        .catch(err => {
+          document.getElementById("status").innerText = "Eroare: " + err;
+        });
+    }
+
+    function afiseazaLog() {
+      fetch(`${serverIP}/logs`)
+        .then(res => res.text())
+        .then(text => {
+          document.getElementById("loguri").innerText = text;
+        })
+        .catch(err => {
+          document.getElementById("loguri").innerText = "Eroare la loguri: " + err;
+        });
+    }
+  </script>
+</body>
+</html>
